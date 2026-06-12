@@ -1,31 +1,43 @@
 // Importamos Express para crear la API
 const express = require("express");
 
-// Importamos las funciones del controller
-const { login, users } = require("./userController");
+// Importamos las fonctions du Controller
+const {login, users, updateUser, removeUser} = require("./userController");
 
 // Creamos la aplicación Express
 const app = express();
 
-// Permitimos que Express lea JSON enviado en el body
+// Permite recibir JSON en el body de las requêtes
 app.use(express.json());
 
-// Ruta simple para comprobar que la API funciona
+
+// Route de test
+// Permite verificar que la API funciona
 app.get("/", (req, res) => {
-  res.status(200).json({
+
+res.status(200).json({
     message: "API CliniquePlus opérationnelle"
   });
-});
 
-// Ruta POST /login
-// Cuando alguien hace POST /login, ejecutamos la función login
+});
+// LOGIN
+// POST /login
 app.post("/login", login);
 
-// Ruta GET /users
-// Permite recuperar la lista de usuarios
+// LISTA DE USUARIOS
+// GET /users
 app.get("/users", users);
 
-// Arrancamos el servidor en el puerto 3000
+// MODIFICAR ROLE
+// PUT /users/1
+app.put("/users/:id", updateUser);
+
+// ELIMINAR USUARIO
+// DELETE /users/1
+app.delete("/users/:id", removeUser);
+
+
+// Arranque del servidor
 app.listen(3000, () => {
   console.log("Serveur lancé sur http://localhost:3000");
 });

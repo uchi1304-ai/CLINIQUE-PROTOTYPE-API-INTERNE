@@ -1,54 +1,82 @@
-// Importamos las funciones que hablan con la base de datos
-const { findAllUsers, findUserByMailAndPassword } = require("./userModel");
+// Importamos las funciones del Model
+const {  findAllUsers, findUserByMailAndPassword,updateUserRole, deleteUser} = require("./userModel");
 
-// Función que gestiona la conexión/login, pero no crea la ruta, solo dice que quiero que haga cuando 
-// intenta conectarse.
+// LOGIN
 function login(req, res) {
-  // Recuperamos mail y password enviados desde Bruno en el body JSON
+
+  // Recuperamos mail y password enviados por Bruno
   const { mail, password } = req.body;
 
-  // Buscamos el usuario en la base con mail y password
-  findUserByMailAndPassword(mail, password, (user) => {
-    // Si no encontramos usuario, respondemos error 404
-    if (!user) {
-      return res.status(404).json({
-        message: "Utilisateur non trouvé"
-      });
-    }
-
-    // Si encontramos usuario, respondemos éxito 200
-    return res.status(200).json({
-      message: "Connexion réussie",
-      user: {
-        id: user.id,
-        mail: user.mail,
-        role: user.role
+  // Pedimos al Model que busque el usuario
+  findUserByMailAndPassword(mail, password,(user) => {
+      // Si no existe
+      if (!user) {
+        return res.status(404).json({
+          message: "Utilisateur non trouvé"
+        });
       }
-    });
-  });
-}
-
-// Función que devuelve todos los usuarios
-function users(req, res) {
-  findAllUsers((users) => {
-    // Si hay problema con la base, users será null
-    if (!users) {
-      return res.status(500).json({
-        message: "Erreur serveur"
+      // Si existe
+      return res.status(200).json({
+        message: "Connexion réussie",
+        user: user
       });
     }
-
-    // Si todo va bien, devolvemos la lista
-    return res.status(200).json({
-      message: "Liste des utilisateurs",
-      users: users
-    });
-  });
+  );
 }
 
-// Exportamos las funciones para usarlas en index.js
-module.exports = { login, users };
 
+// GET USERS
+function users(req, res) {
+  // Pedimos al Model todos los usuarios
+  findAllUsers((users) => {
+      if (!users) {
+        return res.status(500).json({
+          message: "Erreur serveur"
+        });
+      }
+      return res.status(200).json(users);
+    }
+  );
+}
+
+
+// UPDATE USER ROLE
+function updateUser(req, res) {
+  // Recuperamos el id desde la URL
+  const id = req.params.id;
+  // Recuperamos el nuevo role desde Bruno
+  const { role } = req.body;
+  updateUserRole(id, role,(result) => {
+      if (!result) {
+        return res.status(500).json({
+          message: "Erreur serveur"
+        });
+      }
+      return res.status(200).json({
+        message: "Role mis à jour"
+      });
+    }
+  );
+}
+
+// DELETE USER
+function removeUser(req, res) {
+  const id = req.params.id;
+  deleteUser( id,(result) => {
+      if (!result) {
+        return res.status(500).json({
+          message: "Erreur serveur"
+        });
+      }
+      return res.status(200).json({
+        message: "Utilisateur supprimé"
+      });
+    }
+  );
+}
+
+// Exportamos las funciones
+module.exports = {  login,  users,  updateUser,  removeUser};
 //Bruno envía una petición. El Controller recupera el 
 // mail y el password y se los pasa al Model. El Model consulta SQLite. 
 // SQLite verifica si existe un usuario que corresponda a esos datos. 

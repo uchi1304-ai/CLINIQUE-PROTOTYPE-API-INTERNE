@@ -6,5 +6,6 @@ CREATE TABLE users (
 );
 INSERT INTO users (mail, password, role)
 VALUES
+('admin2@cliniqueplus.fr', 'azerty', 'admin');
 ('admin@cliniqueplus.fr', 'azerty', 'admin'),
-('secretaire@cliniqueplus.fr', 'azerty', 'staff');
+('secretaire@cliniqueplus.fr', 'azerty', 'staff')
